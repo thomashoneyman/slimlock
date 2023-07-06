@@ -1,6 +1,6 @@
 # Slimlock
 
-[![nix-tests](https://github.com/thomashoneyman/slimlock/actions/workflows/test.yaml/badge.svg)](https://github.com/thomashoneyman/slimlock/actions/workflows/test.yaml)
+[![nix-tests](https://github.com/thomashoneyman/slimlock/actions/workflows/test.yml/badge.svg)](https://github.com/thomashoneyman/slimlock/actions/workflows/test.yml)
 
 A minimal Nix library for package-lock.json files.
 
