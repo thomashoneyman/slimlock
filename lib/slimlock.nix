@@ -73,15 +73,15 @@
       buildPhase = ''
         export HOME=$PWD/.home
         export npm_config_cache=$PWD/.npm
-        mkdir -p $out
-        cd $out
+        mkdir -p $out/js
+        cd $out/js
         cp -r $src/. .
         cat ${tarballsFile} | xargs npm cache add
         npm ci
       '';
 
       installPhase = ''
-        ln -s $out/node_modules/.bin $out/bin
+        ln -s $out/node_modules/js/.bin $out/bin
       '';
     };
 }
