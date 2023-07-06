@@ -18,7 +18,7 @@ You can get `slimlock` with Nix flakes by adding it to your flake inputs and usi
     slimlock.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, slimlock }:
+  outputs = { self, nixpkgs, flake-utils, slimlock }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         overlays = [ slimlock.overlays.default ];
