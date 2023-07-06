@@ -12,6 +12,7 @@ You can get `slimlock` with Nix flakes by adding it to your flake inputs and usi
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+    flake-utils.url = "github:numtide/flake-utils";
 
     slimlock.url = "github:thomashoneyman/slimlock";
     slimlock.inputs.nixpkgs.follows = "nixpkgs";
@@ -41,7 +42,7 @@ With `slimlock` installed, you can write a derivations to build a `node_modules`
   src = ./my-package;
   modules = slimlock.buildPackageLock { inherit src };
   buildPhase = ''
-    ln -s ${modules}/node_modules .
+    ln -s ${modules}/js/node_modules .
   '';
 }
 ```
