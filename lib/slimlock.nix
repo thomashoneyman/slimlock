@@ -12,16 +12,23 @@
     let
       rootWorkspace = "";
       workspaceDirs = lock.packages.${rootWorkspace}."workspaces" or [ ];
-      workspaceNodeModuleDirs = builtins.map (dir: "node_modules/" + dir) workspaceDirs;
-      workspaceNames = builtins.map (dir: "node_modules/" + lock.packages.${dir}.name or dir) workspaceDirs;
+      workspaceNodeModuleDirs =
+        builtins.map (dir: "node_modules/" + dir) workspaceDirs;
+      workspaceNames =
+        builtins.map (dir: "node_modules/" + lock.packages.${dir}.name or dir)
+        workspaceDirs;
 
-      allWorkspaces = lib.unique ([ rootWorkspace ] ++ workspaceDirs ++ workspaceNames ++ workspaceNodeModuleDirs);
+      allWorkspaces = lib.unique ([ rootWorkspace ] ++ workspaceDirs
+        ++ workspaceNames ++ workspaceNodeModuleDirs);
       removeWorkspaces = packages: removeAttrs packages allWorkspaces;
 
       verifyPackage = name: value: {
-        version = value.version or (throw "Dependency ${name} does not have a 'version' key");
-        integrity = value.integrity or (throw "Dependency ${name} does not have an 'integrity' key");
-        resolved = value.resolved or (throw "Dependency ${name} does not have a 'resolved' key");
+        version = value.version or (throw
+          "Dependency ${name} does not have a 'version' key");
+        integrity = value.integrity or (throw
+          "Dependency ${name} does not have an 'integrity' key");
+        resolved = value.resolved or (throw
+          "Dependency ${name} does not have a 'resolved' key");
       };
 
       # NPM lockfiles differ depending on their version. v1 lockfiles used a
@@ -34,14 +41,28 @@
   # libraries like npmlock2nix.
   fetchDependencyTarball = name: dependency:
     fetchurl {
-      name = let version = dependency.version or (throw "Dependency ${name} does not have a 'version' key"); in "${name}-${version}.tgz";
-      url = dependency.resolved or (throw "Dependency ${name} does not have a 'resolved' key");
-      hash = dependency.integrity or (throw "Dependency ${name} does not have an 'integrity' key");
+      name = let
+        version = dependency.version or (throw
+          "Dependency ${name} does not have a 'version' key");
+      in "${name}-${version}.tgz";
+      url = dependency.resolved or (throw
+        "Dependency ${name} does not have a 'resolved' key");
+      hash = dependency.integrity or (throw
+        "Dependency ${name} does not have an 'integrity' key");
     };
+
+  # https://docs.npmjs.com/cli/v8/commands/npm-ci#omit
+  omitCmd = omit:
+    if builtins.any (x: x != omit) [ "prod" "dev" "peer" ] then
+      lib.concatStringsSep " " (builtins.map (x: "--omit=" + x) omit)
+    else
+      throw "Can only omit 'prod', 'dev', and/or 'peer' dependencies.";
+
+  auditCmd = audit: if audit then "--audit" else "--no-audit";
 
   # Build a package from a package-lock.json file. This will fetch all the
   # tarballs for the dependencies listed in the lockfile and then run `npm ci`
-  buildPackageLock = { src }:
+  buildPackageLock = { src, omit ? [ ], audit ? false }:
     let
       lockfile = src + "/package-lock.json";
       packageLock = readPackageLock lockfile;
@@ -62,7 +83,8 @@
       # We only want to include the package.json and package-lock.json to avoid
       # unnecessary rebuilds.
       src = lib.cleanSourceWith {
-        filter = name: _: !(builtins.elem name [ "package.json" "package-lock.json" ]);
+        filter = name: _:
+          !(builtins.elem name [ "package.json" "package-lock.json" ]);
         src = lib.cleanSource src;
       };
 
@@ -77,7 +99,7 @@
         cd $out/js
         cp -r $src/. .
         cat ${tarballsFile} | xargs npm cache add
-        npm ci
+        npm ci ${omitCmd omit} ${auditCmd audit}
       '';
 
       installPhase = ''

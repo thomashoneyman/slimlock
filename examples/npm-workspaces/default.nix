@@ -1,5 +1,9 @@
 { stdenv, slimlock, }:
-let packageLock = slimlock.buildPackageLock { src = ./.; };
+let
+  packageLock = slimlock.buildPackageLock {
+    src = ./.;
+    omit = [ "dev" "peer" ];
+  };
 in stdenv.mkDerivation {
   name = "npm-workspaces";
   src = ./.;
