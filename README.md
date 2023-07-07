@@ -46,3 +46,17 @@ With `slimlock` installed, you can write a derivations to build a `node_modules`
   '';
 }
 ```
+
+You can override the slimlock derivation if, for example, you have dependencies that require native build dependencies such as python3 or node-gyp. As seen in the [override-attrs](./examples/override-attrs/) example:
+
+```nix
+{slimlock, python3, nodePackages, nodejs}: let
+  modules = (slimlock.buildPackageLock {src = ./.;}).overrideAttrs (final: prev: {
+    nativeBuildInputs = prev.nativeBuildInputs or [] ++ [python3 nodePackages.node-gyp];
+    configurePhase = ''
+      export npm_config_nodedir="${nodejs}"
+    '';
+  });
+in
+  {};
+```
