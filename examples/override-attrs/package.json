@@ -1,7 +1,9 @@
 {
-  "name": "node-gyp-example",
+  "name": "override-attrs",
+  "type": "module",
   "private": true,
   "dependencies": {
-    "better-sqlite3": "^8.4.0"
+    "better-sqlite3": "^8.4.0",
+    "ssh2": "^1.14.0"
   }
 }

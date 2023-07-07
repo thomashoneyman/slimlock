@@ -67,7 +67,8 @@
     packageLock = readPackageLock lockfile;
 
     # Fetch all the tarballs for the dependencies
-    tarballs = builtins.attrValues (builtins.mapAttrs fetchDependencyTarball (getDependencies packageLock));
+    dependencies = getDependencies packageLock;
+    tarballs = builtins.attrValues (builtins.mapAttrs fetchDependencyTarball dependencies);
 
     # Write a file with the list of tarballs
     tarballsFile = writeTextFile {
@@ -87,17 +88,24 @@
         src = lib.cleanSource src;
       };
 
-      buildInputs = [nodejs];
+      propagatedBuildInputs = [nodejs];
 
       buildPhase = ''
         export HOME=$PWD/.home
         export npm_config_cache=$PWD/.npm
         export npm_config_jobs="max"
+        export npm_config_nodedir="${nodejs}"
+
         mkdir -p $out/js
         cd $out/js
-        cp -r $src/. .
+        cp $src/package.json .
+        cp $src/package-lock.json .
         cat ${tarballsFile} | xargs npm cache add
-        npm ci ${omitCmd omit} ${auditCmd audit}
+        npm ci ${omitCmd omit} ${auditCmd audit} --ignore-scripts
+        test -d node_modules/.bin && patchShebangs node_modules/.bin
+        echo "Rebuilding node_modules with patched shebangs and install scripts..."
+        npm rebuild --offline
+        test -d node_modules/.bin && patchShebangs node_modules/.bin
       '';
 
       installPhase = ''
