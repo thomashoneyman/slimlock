@@ -98,14 +98,12 @@
 
         mkdir -p $out/js
         cd $out/js
-        cp $src/package.json .
-        cp $src/package-lock.json .
+        cp -r $src/. .
         cat ${tarballsFile} | xargs npm cache add
         npm ci ${omitCmd omit} ${auditCmd audit} --ignore-scripts
         test -d node_modules/.bin && patchShebangs node_modules/.bin
         echo "Rebuilding node_modules with patched shebangs and install scripts..."
         npm rebuild --offline
-        test -d node_modules/.bin && patchShebangs node_modules/.bin
       '';
 
       installPhase = ''
