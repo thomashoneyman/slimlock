@@ -1,0 +1,7 @@
+{
+  "name": "node-gyp-example",
+  "private": true,
+  "dependencies": {
+    "better-sqlite3": "^8.4.0"
+  }
+}
