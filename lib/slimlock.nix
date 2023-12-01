@@ -90,7 +90,9 @@
 
       propagatedBuildInputs = [nodejs];
 
-      buildPhase = ''
+      preBuildPhases = [ "preBuildPhase" ];
+
+      preBuildPhase = ''
         export HOME=$PWD/.home
         export npm_config_cache=$PWD/.npm
         export npm_config_jobs="max"
@@ -102,6 +104,9 @@
         cat ${tarballsFile} | xargs npm cache add
         npm ci ${omitCmd omit} ${auditCmd audit} --ignore-scripts
         test -d node_modules/.bin && patchShebangs node_modules/.bin
+      '';
+
+      buildPhase = ''
         echo "Rebuilding node_modules with patched shebangs and install scripts..."
         npm rebuild --offline
       '';
