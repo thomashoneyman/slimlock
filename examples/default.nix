@@ -3,4 +3,5 @@
 {callPackage}: {
   npm-workspaces = callPackage ./npm-workspaces {};
   override-attrs = callPackage ./override-attrs {};
+  override-phase = callPackage ./override-phase {};
 }

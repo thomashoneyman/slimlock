@@ -34,7 +34,16 @@ You can get `slimlock` with Nix flakes by adding it to your flake inputs and usi
 
 ## Usage
 
-With `slimlock` installed, you can write a derivations to build a `node_modules` and `bin` directory from a `package-lock.json` file. For example, this derivation relies on a `package-lock.json` file present in `src`:
+All packages in the `package-lock.json` file must have integrity fields of the form `"integrity": "sha512-..."` . NPM is not strict about this, so packages can sometimes be missing hashes. In this case, recreate the `package-lock.json` file:
+
+```console
+rm package-lock.json
+rm -rf node_modules
+npm cache clear --force
+npm install
+```
+
+With `slimlock` installed, you can write a derivation to build `node_modules` and `bin` directories from a `package-lock.json` file. For example, this derivation relies on a `package-lock.json` file present in `src`:
 
 ```nix
 { slimlock, stdenv }: stdenv.mkDerivation rec {
@@ -47,16 +56,9 @@ With `slimlock` installed, you can write a derivations to build a `node_modules`
 }
 ```
 
-You can override the slimlock derivation if, for example, you have dependencies that require native build dependencies such as python3 or node-gyp. As seen in the [override-attrs](./examples/override-attrs/) example:
+You can override a slimlock derivation if, for example, you have dependencies that require native build dependencies. See examples:
 
-```nix
-{slimlock, python3, nodePackages, nodejs}: let
-  modules = (slimlock.buildPackageLock {src = ./.;}).overrideAttrs (final: prev: {
-    nativeBuildInputs = prev.nativeBuildInputs or [] ++ [python3 nodePackages.node-gyp];
-    configurePhase = ''
-      export npm_config_nodedir="${nodejs}"
-    '';
-  });
-in
-  {};
-```
+- [override-attrs](./examples/override-attrs/default.nix)
+- [override-phase](./examples/override-phase/default.nix)
+
+Phases are documented [here](https://nixos.org/manual/nixpkgs/stable/#sec-stdenv-phases).
