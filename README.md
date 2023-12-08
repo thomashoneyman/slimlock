@@ -34,16 +34,13 @@ You can get `slimlock` with Nix flakes by adding it to your flake inputs and usi
 
 ## Usage
 
-Make sure all external `"packages"` in `package-lock.json` have `"integrity": "sha512-..."`.
-If some of them don't (e.g., have `"sha1-..."` instead), recreate `package-lock.json`.
+All packages in the `package-lock.json` file must have integrity fields of the form `"integrity": "sha512-..."` . NPM is not strict about this, so packages can sometimes be missing hashes. In this case, recreate the `package-lock.json` file:
 
 ```console
-cd nodejs-project-directory
 rm package-lock.json
 rm -rf node_modules
 npm cache clear --force
-npm i
-```
+npm install
 
 With `slimlock` installed, you can write a derivation to build `node_modules` and `bin` directories from a `package-lock.json` file. For example, this derivation relies on a `package-lock.json` file present in `src`:
 
