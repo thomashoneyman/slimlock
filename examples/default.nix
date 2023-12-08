@@ -3,5 +3,5 @@
 {callPackage}: {
   npm-workspaces = callPackage ./npm-workspaces {};
   override-attrs = callPackage ./override-attrs {};
-  override-build-command = callPackage ./override-phase {};
+  override-phase = callPackage ./override-phase {};
 }
