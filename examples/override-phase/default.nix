@@ -4,19 +4,18 @@
 , pkg-config
 , poppler_utils
 , pangomm
-, jq
+, lib
 }:
 let
   packageLock = (slimlock.buildPackageLock {
     src = ./.;
   }).overrideAttrs (final: prev: {
-    nativeBuildInputs = prev.nativeBuildInputs or [ ] ++ [
+    nativeBuildInputs = (prev.nativeBuildInputs or [ ]) ++ [
       nodePackages.node-pre-gyp
       python3
       pkg-config
       poppler_utils
       pangomm
-      jq
     ];
 
     buildPhase = ''
@@ -24,15 +23,17 @@ let
 
       rm ./node_modules/.bin/node-pre-gyp
 
-      PACKAGES="$(\
-        cat package-lock.json \
-          | jq -r \
-            '.packages 
-              | keys_unsorted 
-              | .[] 
-              | select(length > 0 and . != "node_modules/@mapbox/node-pre-gyp") 
-              | "./" + .' \
-      )"
+      PACKAGES="${
+        lib.trivial.pipe "${prev.src}/package-lock.json" [
+          builtins.readFile
+          builtins.fromJSON
+          (x: x.packages)
+          builtins.attrNames
+          (builtins.filter (x: x != "" && x != "node_modules/@mapbox/node-pre-gyp"))
+          (builtins.map (lib.strings.removePrefix "node_modules/"))
+          (lib.strings.concatStringsSep " ")
+        ]
+      }"
 
       npm rebuild --offline "$PACKAGES"
     '';
