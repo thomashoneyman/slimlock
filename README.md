@@ -41,6 +41,7 @@ rm package-lock.json
 rm -rf node_modules
 npm cache clear --force
 npm install
+```
 
 With `slimlock` installed, you can write a derivation to build `node_modules` and `bin` directories from a `package-lock.json` file. For example, this derivation relies on a `package-lock.json` file present in `src`:
 
