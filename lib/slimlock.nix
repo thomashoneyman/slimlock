@@ -90,9 +90,7 @@
 
       propagatedBuildInputs = [nodejs];
 
-      preBuildPhases = [ "preBuildPhase" ];
-
-      preBuildPhase = ''
+      configurePhase = ''
         export HOME=$PWD/.home
         export npm_config_cache=$PWD/.npm
         export npm_config_jobs="max"
