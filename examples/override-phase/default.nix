@@ -18,7 +18,11 @@ let
       pangomm
     ];
 
+    # `runHook` is used to let downstream users run `preBuild` and `postBuild` hooks
+    # see https://nixos.org/manual/nixpkgs/stable/#sec-stdenv-phases
     buildPhase = ''
+      runHook preBuild
+
       echo "Rebuilding node_modules with patched shebangs and install scripts..."
 
       rm ./node_modules/.bin/node-pre-gyp
@@ -36,6 +40,8 @@ let
       }"
 
       npm rebuild --offline "$PACKAGES"
+
+      runHook postBuild
     '';
   });
 in
