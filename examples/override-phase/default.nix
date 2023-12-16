@@ -20,6 +20,9 @@ let
 
     # `runHook` is used to let downstream users run `preBuild` and `postBuild` hooks
     # see https://nixos.org/manual/nixpkgs/stable/#sec-stdenv-phases
+
+    # `./`-prefixed packages are used due to `package-spec` for folders
+    # https://docs.npmjs.com/cli/v10/using-npm/package-spec#folders
     buildPhase = ''
       runHook preBuild
 
