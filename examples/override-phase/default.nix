@@ -34,8 +34,7 @@ let
           (x: x.packages)
           builtins.attrNames
           (builtins.filter (x: x != "" && x != "node_modules/@mapbox/node-pre-gyp"))
-          (builtins.map (lib.strings.removePrefix "node_modules/"))
-          (lib.strings.concatStringsSep " ")
+          (lib.strings.concatMapStringsSep " " (x: "./${x}"))
         ]
       }"
 
