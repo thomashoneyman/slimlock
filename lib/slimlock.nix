@@ -101,7 +101,12 @@
         cp -r $src/. .
         cat ${tarballsFile} | xargs -L 1 npm cache add
         npm ci ${omitCmd omit} ${auditCmd audit} --ignore-scripts --offline
-        test -d node_modules/.bin && patchShebangs node_modules/.bin
+        if [[ $(test -d node_modules/.bin) ]]
+        then
+          patchShebangs node_modules/.bin
+        else
+          echo 'No "node_modules/.bin" found.'
+        fi
       '';
 
       buildPhase = ''
