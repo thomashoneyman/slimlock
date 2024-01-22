@@ -115,7 +115,12 @@
       '';
 
       installPhase = ''
-        ln -s $out/node_modules/js/.bin $out/bin
+        if [[ $(test -d node_modules/.bin) ]]
+        then
+          ln -s $out/node_modules/js/.bin $out/bin
+        else
+          echo 'No "node_modules/.bin" found.'
+        fi
       '';
     };
 }
