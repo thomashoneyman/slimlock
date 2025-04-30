@@ -49,7 +49,7 @@ With `slimlock` installed, you can write a derivation to build `node_modules` an
 { slimlock, stdenv }: stdenv.mkDerivation rec {
   name = "my-package";
   src = ./my-package;
-  modules = slimlock.buildPackageLock { inherit src };
+  modules = slimlock.buildPackageLock { inherit src; };
   buildPhase = ''
     ln -s ${modules}/js/node_modules .
   '';
